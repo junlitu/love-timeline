@@ -674,10 +674,16 @@ let photoDataUrl = null;
    Supabase Client
    ============================================ */
 function initSupabase() {
+  if (typeof window.supabase === 'undefined') {
+    console.error('❌ Supabase SDK 未加载');
+    return false;
+  }
   if (!CONFIG.supabaseUrl.includes('YOUR-PROJECT-ID')) {
     supabase = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
+    console.log('✅ Supabase 客户端已创建:', CONFIG.supabaseUrl);
     return true;
   }
+  console.warn('⚠️ Supabase URL 未配置，使用演示模式');
   return false;
 }
 
@@ -698,15 +704,21 @@ function showToast(msg, type = 'info') {
    ============================================ */
 async function checkPassword(input) {
   try {
-    const { data, error } = await supabase
+    const { data, error, status } = await supabase
       .from('settings')
       .select('value')
       .eq('key', 'access_code')
       .single();
-    if (error || !data) return false;
+    if (error) {
+      console.error('❌ 数据库查询失败:', JSON.stringify({ message: error.message, code: error.code, status }, null, 2));
+      showToast('连接失败 (' + (error.code || '401') + ')，请检查 Supabase 配置', 'error');
+      return false;
+    }
+    if (!data) { console.warn('⚠️ settings 表中没有 access_code'); return false; }
+    console.log('✅ 密码校验成功');
     return data.value === input;
   } catch (e) {
-    console.error('Password check error:', e);
+    console.error('❌ 请求异常:', e.message || e);
     return false;
   }
 }
