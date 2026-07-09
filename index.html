@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>我们的秘密花园 💕</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Noto+Serif+SC:wght@400;600;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   CSS Variables & Reset
+   ============================================ */
+:root {
+  --bg-deep: #0a0012;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-glass: rgba(255, 255, 255, 0.06);
+  --border-glass: rgba(255, 255, 255, 0.10);
+  --pink: #ff6b9d;
+  --pink-light: #ffb3c6;
+  --pink-glow: rgba(255, 107, 157, 0.35);
+  --rose: #ff3366;
+  --purple: #c44dff;
+  --purple-glow: rgba(196, 77, 255, 0.30);
+  --gold: #ffd700;
+  --gold-glow: rgba(255, 215, 0, 0.25);
+  --blue: #4dc9f6;
+  --mint: #2ecc71;
+  --text: #ffffff;
+  --text-soft: #ffccd5;
+  --text-muted: rgba(255, 255, 255, 0.55);
+  --radius-xl: 24px;
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-sm: 6px;
+  --font-display: 'Dancing Script', cursive;
+  --font-heading: 'Noto Serif SC', 'ZCOOL XiaoWei', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg-deep);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,107,157,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,107,157,0.6); }
+
+/* ============================================
+   Animations
+   ============================================ */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-12px) rotate(2deg); }
+  75% { transform: translateY(-6px) rotate(-1deg); }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 30px var(--pink-glow); }
+  50% { transform: scale(1.05); box-shadow: 0 0 60px var(--pink-glow), 0 0 100px var(--purple-glow); }
+}
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+@keyframes glow-shift {
+  0%, 100% { text-shadow: 0 0 20px var(--pink-glow), 0 0 40px var(--pink-glow); }
+  50% { text-shadow: 0 0 30px var(--purple-glow), 0 0 60px var(--purple-glow), 0 0 80px var(--pink-glow); }
+}
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+@keyframes confetti-fall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes heart-beat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.3); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.3); }
+  70% { transform: scale(1); }
+}
+.animate-fadeInUp { animation: fadeInUp 0.6s var(--transition) forwards; }
+.animate-fadeIn { animation: fadeIn 0.5s var(--transition) forwards; }
+
+/* ============================================
+   Canvas Background
+   ============================================ */
+#particleCanvas {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+}
+
+/* Animated gradient overlay */
+.bg-gradient {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(135deg, #0a0012 0%, #1a0030 25%, #0d0020 50%, #150028 75%, #0a0012 100%);
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+  z-index: -1;
+}
+
+/* ============================================
+   Password Overlay
+   ============================================ */
+#passwordOverlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(5, 0, 10, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; transition: opacity 0.5s, visibility 0.5s;
+}
+#passwordOverlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.pwd-card {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+  padding: 48px 36px;
+  text-align: center;
+  max-width: 380px; width: 90%;
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  box-shadow: 0 0 60px var(--pink-glow), 0 20px 60px rgba(0,0,0,0.5);
+  animation: fadeInUp 0.8s var(--transition);
+}
+.pwd-card .icon { font-size: 56px; margin-bottom: 12px; animation: float 3s ease-in-out infinite; }
+.pwd-card h2 {
+  font-family: var(--font-display); font-size: 2rem; font-weight: 700;
+  background: linear-gradient(135deg, var(--pink-light), var(--pink), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 6px;
+}
+.pwd-card p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 28px; }
+.pwd-card input {
+  width: 100%; padding: 14px 20px; border-radius: 50px;
+  border: 1px solid var(--border-glass);
+  background: rgba(255,255,255,0.06);
+  color: var(--text); font-size: 1.1rem; text-align: center;
+  outline: none; transition: var(--transition);
+  letter-spacing: 4px;
+}
+.pwd-card input:focus { border-color: var(--pink); box-shadow: 0 0 20px var(--pink-glow); }
+.pwd-card input.shake { animation: shake 0.5s; border-color: var(--rose); }
+.pwd-card button {
+  width: 100%; margin-top: 16px; padding: 14px;
+  border-radius: 50px; border: none;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: #fff; font-size: 1rem; font-weight: 600;
+  cursor: pointer; transition: var(--transition);
+  letter-spacing: 2px;
+}
+.pwd-card button:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--purple-glow); }
+.pwd-card button:active { transform: scale(0.97); }
+
+/* ============================================
+   Main Layout
+   ============================================ */
+#app { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 0 20px 120px; }
+
+/* ============================================
+   Hero Section
+   ============================================ */
+.hero { text-align: center; padding: 50px 0 30px; }
+.hero .couple-names {
+  font-family: var(--font-display); font-size: 1.6rem; color: var(--text-soft);
+  margin-bottom: 8px; letter-spacing: 2px;
+}
+.hero .couple-names span { margin: 0 8px; }
+.hero .heart-icon {
+  display: inline-block; font-size: 1.4rem;
+  animation: heart-beat 1.5s ease-in-out infinite;
+}
+.hero .label {
+  font-size: 1rem; color: var(--text-muted); margin-bottom: 4px;
+  font-family: var(--font-heading); letter-spacing: 3px;
+}
+.hero .days-count {
+  font-family: var(--font-display); font-size: clamp(4rem, 10vw, 7rem);
+  font-weight: 700; line-height: 1;
+  background: linear-gradient(135deg, var(--pink-light) 0%, var(--pink) 40%, var(--purple) 70%, var(--gold) 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: glow-shift 3s ease-in-out infinite, gradient-shift 4s ease infinite;
+}
+.hero .days-label {
+  font-family: var(--font-heading); font-size: 1.2rem;
+  color: var(--text-soft); margin-top: 4px; letter-spacing: 2px;
+}
+.hero .start-date { color: var(--text-muted); font-size: 0.85rem; margin-top: 8px; }
+.sparkle-container { position: relative; display: inline-block; }
+.sparkle {
+  position: absolute; font-size: 1.2rem; pointer-events: none;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+/* ============================================
+   Stats Bar
+   ============================================ */
+.stats-bar {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  margin: 10px 0 30px;
+}
+.stat-card {
+  background: var(--bg-glass); border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg); padding: 18px 12px;
+  text-align: center; backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: var(--transition);
+}
+.stat-card:hover { border-color: var(--pink); transform: translateY(-2px); box-shadow: 0 8px 25px var(--pink-glow); }
+.stat-card .stat-icon { font-size: 1.6rem; margin-bottom: 6px; }
+.stat-card .stat-num { font-size: 1.8rem; font-weight: 700; font-family: var(--font-display); background: linear-gradient(135deg, var(--pink-light), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.stat-card .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+/* ============================================
+   Timeline
+   ============================================ */
+.timeline { position: relative; padding-left: 32px; }
+.timeline::before {
+  content: ''; position: absolute; left: 11px; top: 0; bottom: 0;
+  width: 2px; background: linear-gradient(to bottom, var(--pink), var(--purple), var(--pink-light));
+  border-radius: 1px;
+}
+.timeline-empty {
+  text-align: center; padding: 60px 20px; color: var(--text-muted);
+}
+.timeline-empty .empty-icon { font-size: 4rem; display: block; margin-bottom: 12px; animation: float 4s ease-in-out infinite; }
+.timeline-empty p { font-family: var(--font-heading); font-size: 1rem; }
+
+/* Timeline dot */
+.tl-dot {
+  position: absolute; left: -26px; top: 24px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--pink); box-shadow: 0 0 12px var(--pink-glow);
+  z-index: 1; transition: var(--transition);
+}
+.tl-item:hover .tl-dot { transform: scale(1.5); box-shadow: 0 0 20px var(--purple-glow); }
+
+/* ============================================
+   Memory Card
+   ============================================ */
+.memory-card {
+  position: relative; margin-bottom: 20px; padding: 20px 22px;
+  background: var(--bg-glass); border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg); backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: var(--transition); opacity: 0; transform: translateY(20px);
+}
+.memory-card.visible { opacity: 1; transform: translateY(0); transition: opacity 0.5s, transform 0.5s var(--transition); }
+.memory-card:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+.memory-card .card-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.memory-card .card-title { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 600; flex: 1; min-width: 0; }
+.memory-card .card-date { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; }
+.memory-card .card-category { display: inline-block; padding: 3px 10px; border-radius: 50px; font-size: 0.72rem; font-weight: 600; letter-spacing: 1px; }
+.memory-card .card-desc { font-size: 0.9rem; color: var(--text-soft); line-height: 1.6; margin-top: 8px; }
+.memory-card .card-photo { margin-top: 12px; border-radius: var(--radius-md); width: 100%; max-height: 360px; object-fit: cover; cursor: pointer; transition: var(--transition); }
+.memory-card .card-photo:hover { transform: scale(1.02); box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
+.memory-card .card-actions { display: flex; gap: 8px; margin-top: 14px; justify-content: flex-end; }
+.memory-card .card-actions button {
+  padding: 6px 16px; border-radius: 50px; border: 1px solid var(--border-glass);
+  background: rgba(255,255,255,0.06); color: var(--text-muted);
+  font-size: 0.8rem; cursor: pointer; transition: var(--transition);
+}
+.memory-card .card-actions button:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+.memory-card .card-actions .btn-edit:hover { background: rgba(196,77,255,0.2); border-color: var(--purple); }
+.memory-card .card-actions .btn-delete:hover { background: rgba(255,51,102,0.2); border-color: var(--rose); }
+.memory-card .days-ago {
+  position: absolute; top: 20px; right: 22px;
+  font-size: 0.72rem; color: var(--text-muted);
+}
+
+/* Category colors */
+.cat-first { background: rgba(255,215,0,0.15); color: var(--gold); }
+.cat-travel { background: rgba(77,201,246,0.15); color: var(--blue); }
+.cat-anniversary { background: rgba(255,107,157,0.15); color: var(--pink); }
+.cat-special { background: rgba(196,77,255,0.15); color: var(--purple); }
+.cat-daily { background: rgba(46,204,113,0.15); color: var(--mint); }
+.card-border-first { border-left: 3px solid var(--gold); }
+.card-border-travel { border-left: 3px solid var(--blue); }
+.card-border-anniversary { border-left: 3px solid var(--pink); }
+.card-border-special { border-left: 3px solid var(--purple); }
+.card-border-daily { border-left: 3px solid var(--mint); }
+
+/* ============================================
+   Floating Action Button
+   ============================================ */
+.fab-container { position: fixed; bottom: 32px; right: 28px; z-index: 100; }
+.fab {
+  width: 58px; height: 58px; border-radius: 50%; border: none;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: #fff; font-size: 28px; cursor: pointer;
+  box-shadow: 0 8px 30px var(--purple-glow);
+  transition: var(--transition); position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.fab:hover { transform: scale(1.1) rotate(90deg); box-shadow: 0 12px 40px var(--purple-glow); }
+.fab:active { transform: scale(0.95); }
+.fab-ring {
+  position: absolute; width: 100%; height: 100%; border-radius: 50%;
+  border: 2px solid var(--pink); animation: pulse-ring 2s ease-out infinite;
+}
+.fab-tip {
+  position: absolute; right: 70px; top: 50%; transform: translateY(-50%);
+  background: var(--bg-glass); border: 1px solid var(--border-glass);
+  border-radius: 50px; padding: 6px 14px; font-size: 0.78rem;
+  color: var(--text-soft); white-space: nowrap; pointer-events: none;
+  backdrop-filter: blur(10px); opacity: 0; transition: opacity 0.3s;
+}
+.fab-container:hover .fab-tip { opacity: 1; }
+
+/* ============================================
+   Modal
+   ============================================ */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(5, 0, 10, 0.85); backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2000; opacity: 0; visibility: hidden; transition: 0.3s;
+}
+.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal {
+  background: rgba(20, 5, 40, 0.95); border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl); padding: 32px 28px;
+  max-width: 480px; width: 92%; max-height: 85vh; overflow-y: auto;
+  backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 60px var(--pink-glow);
+  transform: translateY(20px); transition: transform 0.3s var(--transition);
+}
+.modal-overlay.active .modal { transform: translateY(0); }
+.modal h3 {
+  font-family: var(--font-heading); font-size: 1.3rem; text-align: center;
+  margin-bottom: 24px; background: linear-gradient(135deg, var(--pink-light), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.modal .form-group { margin-bottom: 16px; }
+.modal label { display: block; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 1px; }
+.modal input, .modal textarea, .modal select {
+  width: 100%; padding: 12px 16px; border-radius: var(--radius-md);
+  border: 1px solid var(--border-glass); background: rgba(255,255,255,0.05);
+  color: #fff; font-size: 0.95rem; outline: none; transition: var(--transition);
+  font-family: var(--font-body); resize: vertical;
+}
+.modal input:focus, .modal textarea:focus, .modal select:focus {
+  border-color: var(--pink); box-shadow: 0 0 12px var(--pink-glow);
+}
+.modal select option { background: #1a0030; color: #fff; }
+.modal .category-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.modal .category-options label {
+  padding: 7px 14px; border-radius: 50px; font-size: 0.78rem;
+  border: 1px solid var(--border-glass); cursor: pointer;
+  transition: var(--transition); background: rgba(255,255,255,0.04);
+  color: var(--text-muted);
+}
+.modal .category-options input[type="radio"] { display: none; }
+.modal .category-options input[type="radio"]:checked + span {
+  color: #fff;
+}
+.modal .category-options label:has(input:checked) { border-color: var(--pink); background: rgba(255,107,157,0.15); color: #fff; }
+.modal .photo-preview { margin-top: 8px; text-align: center; }
+.modal .photo-preview img { max-width: 100%; max-height: 150px; border-radius: var(--radius-md); }
+.modal .photo-preview .remove-photo {
+  display: inline-block; margin-top: 6px; font-size: 0.78rem; color: var(--rose); cursor: pointer;
+}
+.modal .btn-row { display: flex; gap: 10px; margin-top: 24px; }
+.modal .btn-row button {
+  flex: 1; padding: 12px; border-radius: 50px; border: none;
+  font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: var(--transition);
+  letter-spacing: 1px;
+}
+.modal .btn-save { background: linear-gradient(135deg, var(--pink), var(--purple)); color: #fff; }
+.modal .btn-save:hover { box-shadow: 0 8px 25px var(--purple-glow); transform: translateY(-1px); }
+.modal .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+.modal .btn-cancel { background: rgba(255,255,255,0.08); color: var(--text-muted); border: 1px solid var(--border-glass); }
+.modal .btn-cancel:hover { background: rgba(255,255,255,0.14); color: #fff; }
+.modal .btn-delete-memory {
+  background: rgba(255,51,102,0.12); color: var(--rose); border: 1px solid rgba(255,51,102,0.3);
+  font-size: 0.85rem; padding: 10px; border-radius: 50px; cursor: pointer;
+  width: 100%; margin-top: 8px; transition: var(--transition);
+}
+.modal .btn-delete-memory:hover { background: rgba(255,51,102,0.25); }
+.modal .char-count { font-size: 0.72rem; color: var(--text-muted); text-align: right; margin-top: 4px; }
+
+/* ============================================
+   Toast
+   ============================================ */
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 3000; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  padding: 14px 20px; border-radius: var(--radius-md);
+  background: rgba(20,5,40,0.95); border: 1px solid var(--border-glass);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  font-size: 0.88rem; color: #fff; max-width: 320px;
+  animation: slideInRight 0.4s var(--transition);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  display: flex; align-items: center; gap: 8px;
+}
+.toast.success { border-left: 3px solid var(--mint); }
+.toast.error { border-left: 3px solid var(--rose); }
+.toast.info { border-left: 3px solid var(--blue); }
+
+/* ============================================
+   Image Lightbox
+   ============================================ */
+.lightbox {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.92); display: flex; align-items: center; justify-content: center;
+  z-index: 2500; cursor: pointer; opacity: 0; visibility: hidden; transition: 0.3s;
+}
+.lightbox.active { opacity: 1; visibility: visible; }
+.lightbox img { max-width: 95%; max-height: 90vh; border-radius: var(--radius-lg); transform: scale(0.9); transition: transform 0.3s var(--transition); }
+.lightbox.active img { transform: scale(1); }
+
+/* ============================================
+   Loading Spinner
+   ============================================ */
+.spinner {
+  display: inline-block; width: 24px; height: 24px;
+  border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--pink);
+  border-radius: 50%; animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-overlay {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 30px; color: var(--text-muted);
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 640px) {
+  .hero { padding: 36px 0 20px; }
+  .hero .couple-names { font-size: 1.3rem; }
+  .hero .days-count { font-size: 3.5rem; }
+  .stats-bar { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat-card { padding: 14px 8px; }
+  .stat-card .stat-num { font-size: 1.4rem; }
+  .stat-card .stat-icon { font-size: 1.2rem; }
+  .stat-card .stat-label { font-size: 0.68rem; }
+  .timeline { padding-left: 28px; }
+  .timeline::before { left: 9px; }
+  .tl-dot { left: -24px; top: 22px; width: 12px; height: 12px; }
+  .memory-card { padding: 16px; }
+  .memory-card .card-title { font-size: 1rem; }
+  .memory-card .days-ago { position: static; margin-bottom: 6px; }
+  .fab { width: 50px; height: 50px; font-size: 24px; }
+  .fab-container { bottom: 24px; right: 20px; }
+  .modal { padding: 24px 18px; }
+  .modal .category-options { gap: 6px; }
+  .modal .category-options label { padding: 6px 10px; font-size: 0.72rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-gradient"></div>
+<canvas id="particleCanvas"></canvas>
+
+<!-- Password Overlay -->
+<div id="passwordOverlay">
+  <div class="pwd-card">
+    <div class="icon">🌹</div>
+    <h2>我们的秘密花园</h2>
+    <p>请输入属于我们的密码</p>
+    <input type="password" id="pwdInput" placeholder="· · · · · ·" maxlength="10" autocomplete="off">
+    <button id="pwdSubmit">✨ 进入</button>
+  </div>
+</div>
+
+<!-- Main App -->
+<div id="app" style="display:none;">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="couple-names">
+      <span id="name1">涂俊李</span>
+      <span class="heart-icon">💕</span>
+      <span id="name2">宝贝</span>
+    </div>
+    <div class="label">已经在一起</div>
+    <div class="sparkle-container">
+      <span class="sparkle" style="top:-10px;left:-20px;animation-delay:0s;">✨</span>
+      <span class="sparkle" style="top:10px;right:-24px;animation-delay:0.7s;">✨</span>
+      <span class="sparkle" style="bottom:-5px;left:-16px;animation-delay:1.4s;">⭐</span>
+      <div class="days-count" id="daysCount">0</div>
+    </div>
+    <div class="days-label">天</div>
+    <div class="start-date" id="startDateLabel"></div>
+  </section>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-icon">📝</div>
+      <div class="stat-num" id="statTotal">0</div>
+      <div class="stat-label">总回忆</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💗</div>
+      <div class="stat-num" id="statFirsts">0</div>
+      <div class="stat-label">第一次</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎂</div>
+      <div class="stat-num" id="statAnniversary">-</div>
+      <div class="stat-label">周年倒计时</div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline" id="timeline">
+    <div class="loading-overlay"><span class="spinner"></span> 加载回忆中...</div>
+  </div>
+</div>
+
+<!-- Floating Action Button -->
+<div class="fab-container" id="fabContainer" style="display:none;">
+  <span class="fab-tip">添加回忆</span>
+  <button class="fab" id="fabBtn" title="添加回忆">+</button>
+  <div class="fab-ring"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3 id="modalTitle">✨ 添加回忆</h3>
+    <form id="memoryForm" autocomplete="off">
+      <div class="form-group">
+        <label>📌 标题</label>
+        <input type="text" id="memTitle" placeholder="比如：第一次一起看电影" maxlength="50" required>
+      </div>
+      <div class="form-group">
+        <label>📅 日期</label>
+        <input type="date" id="memDate" required>
+      </div>
+      <div class="form-group">
+        <label>🏷️ 分类</label>
+        <div class="category-options" id="categoryOptions">
+          <label><input type="radio" name="category" value="first" checked><span>💗 第一次</span></label>
+          <label><input type="radio" name="category" value="travel"><span>✈️ 旅行</span></label>
+          <label><input type="radio" name="category" value="anniversary"><span>💝 纪念日</span></label>
+          <label><input type="radio" name="category" value="special"><span>🌟 特别</span></label>
+          <label><input type="radio" name="category" value="daily"><span>🌸 日常</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>💬 描述</label>
+        <textarea id="memDesc" rows="3" placeholder="记录下这个美好瞬间..." maxlength="500"></textarea>
+        <div class="char-count"><span id="charCount">0</span>/500</div>
+      </div>
+      <div class="form-group">
+        <label>📷 照片</label>
+        <input type="file" id="memPhoto" accept="image/*" style="padding:10px;">
+        <div class="photo-preview" id="photoPreview" style="display:none;"></div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn-cancel" id="btnCancel">取消</button>
+        <button type="submit" class="btn-save" id="btnSave">💾 保存</button>
+      </div>
+      <button type="button" class="btn-delete-memory" id="btnDeleteMemory" style="display:none;">🗑️ 删除这条回忆</button>
+    </form>
+  </div>
+</div>
+
+<!-- Image Lightbox -->
+<div class="lightbox" id="lightbox"><img src="" alt="照片" id="lightboxImg"></div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+
+<script>
+/* ============================================
+   Configuration — 请修改以下配置
+   ============================================ */
+const CONFIG = {
+  // Supabase 项目信息（从 Supabase 后台 Settings → API 获取）
+  supabaseUrl: 'https://oergzkourysenkeynqfz.supabase.co',  // 👈 Project URL
+  supabaseKey: 'YOUR_ANON_KEY_HERE',                 // 👈 替换为你的 anon key（一串很长的 eyJ... 开头的字符串）
+
+  // 你们的信息
+  startDate: '2026-06-23',   // 👈 替换为你们的开始日期 (YYYY-MM-DD)
+  coupleName1: '涂俊李',
+  coupleName2: '龚可欣',
+};
+
+/* ============================================
+   DOM References
+   ============================================ */
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+
+const dom = {
+  overlay: $('#passwordOverlay'),
+  pwdInput: $('#pwdInput'),
+  pwdSubmit: $('#pwdSubmit'),
+  app: $('#app'),
+  fabContainer: $('#fabContainer'),
+  fabBtn: $('#fabBtn'),
+  timeline: $('#timeline'),
+  daysCount: $('#daysCount'),
+  startDateLabel: $('#startDateLabel'),
+  statTotal: $('#statTotal'),
+  statFirsts: $('#statFirsts'),
+  statAnniversary: $('#statAnniversary'),
+  name1: $('#name1'),
+  name2: $('#name2'),
+  modalOverlay: $('#modalOverlay'),
+  modalTitle: $('#modalTitle'),
+  memoryForm: $('#memoryForm'),
+  memTitle: $('#memTitle'),
+  memDate: $('#memDate'),
+  memDesc: $('#memDesc'),
+  memPhoto: $('#memPhoto'),
+  photoPreview: $('#photoPreview'),
+  btnSave: $('#btnSave'),
+  btnCancel: $('#btnCancel'),
+  btnDeleteMemory: $('#btnDeleteMemory'),
+  charCount: $('#charCount'),
+  lightbox: $('#lightbox'),
+  lightboxImg: $('#lightboxImg'),
+  toastContainer: $('#toastContainer'),
+  canvas: $('#particleCanvas'),
+};
+
+/* ============================================
+   Globals
+   ============================================ */
+let supabase = null;
+let allMemories = [];
+let editingId = null;
+let photoFile = null;
+let photoDataUrl = null;
+
+/* ============================================
+   Supabase Client
+   ============================================ */
+function initSupabase() {
+  if (!CONFIG.supabaseUrl.includes('YOUR-PROJECT-ID')) {
+    supabase = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
+    return true;
+  }
+  return false;
+}
+
+/* ============================================
+   Toast
+   ============================================ */
+function showToast(msg, type = 'info') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icons = { success: '✅', error: '❌', info: '💡' };
+  t.innerHTML = `${icons[type] || '💡'} ${msg}`;
+  dom.toastContainer.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+/* ============================================
+   Password Gate
+   ============================================ */
+async function checkPassword(input) {
+  try {
+    const { data, error } = await supabase
+      .from('settings')
+      .select('value')
+      .eq('key', 'access_code')
+      .single();
+    if (error || !data) return false;
+    return data.value === input;
+  } catch (e) {
+    console.error('Password check error:', e);
+    return false;
+  }
+}
+
+async function handlePasswordSubmit() {
+  const code = dom.pwdInput.value.trim();
+  if (!code) { dom.pwdInput.classList.add('shake'); setTimeout(() => dom.pwdInput.classList.remove('shake'), 500); return; }
+
+  if (!supabase) {
+    // Demo mode — no Supabase configured
+    sessionStorage.setItem('love_auth', 'demo');
+    dom.overlay.classList.add('hidden');
+    dom.app.style.display = 'block';
+    dom.fabContainer.style.display = 'block';
+    dom.name1.textContent = CONFIG.coupleName1;
+    dom.name2.textContent = CONFIG.coupleName2;
+    initApp();
+    showToast('当前为演示模式，请配置 Supabase 后使用完整功能', 'info');
+    return;
+  }
+
+  const valid = await checkPassword(code);
+  if (valid) {
+    sessionStorage.setItem('love_auth', code);
+    dom.overlay.classList.add('hidden');
+    dom.app.style.display = 'block';
+    dom.fabContainer.style.display = 'block';
+    dom.name1.textContent = CONFIG.coupleName1;
+    dom.name2.textContent = CONFIG.coupleName2;
+    initApp();
+  } else {
+    dom.pwdInput.classList.add('shake');
+    showToast('密码不对哦，再试一次吧 💕', 'error');
+    setTimeout(() => dom.pwdInput.classList.remove('shake'), 500);
+  }
+}
+
+/* ============================================
+   Day Counter
+   ============================================ */
+function getDaysTogether() {
+  const start = new Date(CONFIG.startDate + 'T00:00:00');
+  const now = new Date();
+  return Math.max(0, Math.floor((now - start) / (1000 * 60 * 60 * 24)));
+}
+
+function getNextAnniversary() {
+  const start = new Date(CONFIG.startDate + 'T00:00:00');
+  const now = new Date();
+  let next = new Date(now.getFullYear(), start.getMonth(), start.getDate());
+  if (next <= now) next = new Date(now.getFullYear() + 1, start.getMonth(), start.getDate());
+  return Math.max(0, Math.ceil((next - now) / (1000 * 60 * 60 * 24)));
+}
+
+function getDaysAgo(dateStr) {
+  const date = new Date(dateStr + 'T00:00:00');
+  const now = new Date();
+  const diff = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+  if (diff < 0) return '未来';
+  if (diff === 0) return '今天';
+  if (diff === 1) return '昨天';
+  return diff + ' 天前';
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+}
+
+function updateCounters() {
+  const days = getDaysTogether();
+  animateNumber(dom.daysCount, days);
+
+  const startDate = new Date(CONFIG.startDate + 'T00:00:00');
+  dom.startDateLabel.textContent = `从 ${startDate.getFullYear()}年${startDate.getMonth() + 1}月${startDate.getDate()}日 开始`;
+
+  // Stats
+  dom.statTotal.textContent = allMemories.length;
+  dom.statFirsts.textContent = allMemories.filter(m => m.category === 'first').length;
+
+  const anni = getNextAnniversary();
+  dom.statAnniversary.textContent = anni > 0 ? `${anni} 天` : '🎉 今天!';
+}
+
+function animateNumber(el, target) {
+  const start = parseInt(el.textContent) || 0;
+  if (start === target) { el.textContent = target; return; }
+  const duration = 1000;
+  const step = (timestamp) => {
+    if (!animateNumber._t0) animateNumber._t0 = timestamp;
+    const progress = Math.min((timestamp - animateNumber._t0) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+    el.textContent = Math.floor(start + (target - start) * eased);
+    if (progress < 1) requestAnimationFrame(step);
+    else { el.textContent = target; animateNumber._t0 = null; }
+  };
+  requestAnimationFrame(step);
+}
+
+/* ============================================
+   Category Helpers
+   ============================================ */
+const CATEGORY_MAP = {
+  first: { label: '第一次', css: 'cat-first', border: 'card-border-first', icon: '💗' },
+  travel: { label: '旅行', css: 'cat-travel', border: 'card-border-travel', icon: '✈️' },
+  anniversary: { label: '纪念日', css: 'cat-anniversary', border: 'card-border-anniversary', icon: '💝' },
+  special: { label: '特别', css: 'cat-special', border: 'card-border-special', icon: '🌟' },
+  daily: { label: '日常', css: 'cat-daily', border: 'card-border-daily', icon: '🌸' },
+};
+
+/* ============================================
+   Photo Handling
+   ============================================ */
+async function compressImage(file, maxWidth = 1200, quality = 0.7) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > maxWidth) { h = (h * maxWidth) / w; w = maxWidth; }
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadPhoto(file) {
+  const compressed = await compressImage(file);
+  const fileName = `photo_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+  const { data, error } = await supabase.storage
+    .from('memories')
+    .upload(fileName, compressed, { contentType: 'image/jpeg', upsert: false });
+  if (error) throw error;
+  const { data: urlData } = supabase.storage.from('memories').getPublicUrl(fileName);
+  return urlData.publicUrl;
+}
+
+/* ============================================
+   CRUD Operations
+   ============================================ */
+async function loadMemories() {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('memories')
+    .select('*')
+    .order('date', { ascending: false });
+  if (error) { console.error('Load error:', error); return []; }
+  return data || [];
+}
+
+async function saveMemory(memory) {
+  if (!supabase) {
+    // Demo mode — simulate save locally
+    const demoMem = { ...memory, id: 'demo_' + Date.now(), created_at: new Date().toISOString() };
+    const demoData = JSON.parse(localStorage.getItem('love_demo_memories') || '[]');
+    demoData.unshift(demoMem);
+    localStorage.setItem('love_demo_memories', JSON.stringify(demoData));
+    return demoMem;
+  }
+  const { data, error } = await supabase.from('memories').insert([memory]).select();
+  if (error) throw error;
+  return data[0];
+}
+
+async function updateMemory(id, updates) {
+  if (!supabase) {
+    const demoData = JSON.parse(localStorage.getItem('love_demo_memories') || '[]');
+    const idx = demoData.findIndex(m => m.id === id);
+    if (idx >= 0) { demoData[idx] = { ...demoData[idx], ...updates, updated_at: new Date().toISOString() }; }
+    localStorage.setItem('love_demo_memories', JSON.stringify(demoData));
+    return demoData[idx];
+  }
+  const { data, error } = await supabase.from('memories').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id).select();
+  if (error) throw error;
+  return data[0];
+}
+
+async function deleteMemory(id) {
+  if (!supabase) {
+    const demoData = JSON.parse(localStorage.getItem('love_demo_memories') || '[]');
+    localStorage.setItem('love_demo_memories', JSON.stringify(demoData.filter(m => m.id !== id)));
+    return;
+  }
+  const { error } = await supabase.from('memories').delete().eq('id', id);
+  if (error) throw error;
+}
+
+/* ============================================
+   Render Timeline
+   ============================================ */
+function renderTimeline(memories) {
+  dom.timeline.innerHTML = '';
+
+  if (!memories || memories.length === 0) {
+    dom.timeline.innerHTML = `
+      <div class="timeline-empty animate-fadeIn">
+        <span class="empty-icon">💌</span>
+        <p>还没有回忆呢</p>
+        <p style="font-size:0.85rem;margin-top:6px;">点击右下角 + 添加你们的第一条回忆吧</p>
+      </div>`;
+    return;
+  }
+
+  memories.forEach((m, i) => {
+    const cat = CATEGORY_MAP[m.category] || CATEGORY_MAP.daily;
+    const card = document.createElement('div');
+    card.className = `memory-card ${cat.border}`;
+    card.style.animationDelay = `${i * 0.06}s`;
+    card.setAttribute('data-id', m.id);
+    card.innerHTML = `
+      <div class="tl-dot"></div>
+      <span class="days-ago">${getDaysAgo(m.date)}</span>
+      <div class="card-header">
+        <span class="card-title">${escapeHtml(m.title)}</span>
+        <span class="card-category ${cat.css}">${cat.icon} ${cat.label}</span>
+      </div>
+      <div class="card-date">📅 ${formatDate(m.date)}${m.author ? ' · by ' + escapeHtml(m.author) : ''}</div>
+      ${m.description ? `<div class="card-desc">${escapeHtml(m.description)}</div>` : ''}
+      ${m.photo_url ? `<img class="card-photo" src="${escapeHtml(m.photo_url)}" alt="照片" loading="lazy" onclick="event.stopPropagation(); openLightbox('${escapeHtml(m.photo_url)}')">` : ''}
+      <div class="card-actions">
+        <button class="btn-edit" data-id="${m.id}">✏️ 编辑</button>
+        <button class="btn-delete" data-id="${m.id}">🗑️ 删除</button>
+      </div>`;
+
+    dom.timeline.appendChild(card);
+
+    // Click handlers
+    card.querySelector('.btn-edit').addEventListener('click', (e) => { e.stopPropagation(); openEditModal(m); });
+    card.querySelector('.btn-delete').addEventListener('click', (e) => { e.stopPropagation(); confirmDelete(m.id); });
+  });
+
+  // Animate cards in view
+  requestAnimationFrame(() => {
+    dom.timeline.querySelectorAll('.memory-card').forEach(c => c.classList.add('visible'));
+  });
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* ============================================
+   Refresh All
+   ============================================ */
+async function refreshAll() {
+  allMemories = await loadMemories();
+  renderTimeline(allMemories);
+  updateCounters();
+}
+
+/* ============================================
+   Modal Operations
+   ============================================ */
+function openModal(title, memory = null) {
+  editingId = memory ? memory.id : null;
+  photoFile = null;
+  photoDataUrl = null;
+  dom.modalTitle.textContent = title;
+  dom.memTitle.value = memory ? memory.title : '';
+  dom.memDate.value = memory ? memory.date : new Date().toISOString().slice(0, 10);
+  dom.memDesc.value = memory ? (memory.description || '') : '';
+  dom.memPhoto.value = '';
+  dom.photoPreview.style.display = 'none';
+  dom.photoPreview.innerHTML = '';
+  dom.charCount.textContent = (memory && memory.description) ? memory.description.length : 0;
+  dom.btnDeleteMemory.style.display = memory ? 'block' : 'none';
+
+  // Set category
+  const cat = memory ? memory.category : 'first';
+  const radio = dom.memoryForm.querySelector(`input[name="category"][value="${cat}"]`);
+  if (radio) radio.checked = true;
+
+  dom.modalOverlay.classList.add('active');
+  dom.memTitle.focus();
+}
+
+function closeModal() {
+  dom.modalOverlay.classList.remove('active');
+  editingId = null;
+  photoFile = null;
+  photoDataUrl = null;
+}
+
+function openEditModal(memory) {
+  openModal('✏️ 编辑回忆', memory);
+}
+
+async function handleFormSubmit(e) {
+  e.preventDefault();
+  const saveBtn = dom.btnSave;
+  saveBtn.disabled = true;
+  saveBtn.textContent = '⏳ 保存中...';
+
+  try {
+    const title = dom.memTitle.value.trim();
+    const date = dom.memDate.value;
+    const category = dom.memoryForm.querySelector('input[name="category"]:checked')?.value || 'daily';
+    const description = dom.memDesc.value.trim();
+
+    if (!title || !date) { showToast('标题和日期不能为空哦～', 'error'); saveBtn.disabled = false; saveBtn.textContent = '💾 保存'; return; }
+
+    let photoUrl = editingId ? (allMemories.find(m => m.id === editingId)?.photo_url || null) : null;
+
+    // Upload new photo if selected
+    if (photoFile) {
+      photoUrl = await uploadPhoto(photoFile);
+    }
+
+    const payload = {
+      title,
+      date,
+      category,
+      description,
+      photo_url: photoUrl,
+      author: editingId ? undefined : (Math.random() > 0.5 ? CONFIG.coupleName1 : CONFIG.coupleName2),
+    };
+    // Remove undefined keys
+    Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+
+    if (editingId) {
+      await updateMemory(editingId, payload);
+      showToast('回忆已更新 ✨', 'success');
+    } else {
+      await saveMemory(payload);
+      showToast('回忆添加成功！💕', 'success');
+      burstConfetti();
+    }
+
+    closeModal();
+    await refreshAll();
+  } catch (err) {
+    console.error('Save error:', err);
+    showToast('保存失败，请检查网络后重试 😢', 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = '💾 保存';
+  }
+}
+
+async function confirmDelete(id) {
+  if (!confirm('确定要删除这条回忆吗？删除后不可恢复哦 🥺')) return;
+  try {
+    await deleteMemory(id);
+    showToast('回忆已删除', 'info');
+    await refreshAll();
+  } catch (err) {
+    console.error('Delete error:', err);
+    showToast('删除失败，请重试', 'error');
+  }
+}
+
+async function handleDeleteInModal() {
+  if (!editingId) return;
+  await confirmDelete(editingId);
+  closeModal();
+}
+
+/* ============================================
+   Lightbox
+   ============================================ */
+function openLightbox(url) {
+  dom.lightboxImg.src = url;
+  dom.lightbox.classList.add('active');
+}
+function closeLightbox() {
+  dom.lightbox.classList.remove('active');
+}
+
+/* ============================================
+   Real-time Subscription
+   ============================================ */
+function subscribeRealtime() {
+  if (!supabase) return;
+  supabase
+    .channel('memories-changes')
+    .on('postgres_changes',
+      { event: '*', schema: 'public', table: 'memories' },
+      (payload) => {
+        console.log('📡 实时更新:', payload.eventType);
+        refreshAll();
+      }
+    )
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') console.log('✅ 实时同步已连接');
+      else console.log('📡 实时同步状态:', status);
+    });
+}
+
+/* ============================================
+   Particle System (Floating Hearts)
+   ============================================ */
+class ParticleSystem {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.particles = [];
+    this.resize();
+    this.running = true;
+    window.addEventListener('resize', () => this.resize());
+  }
+
+  resize() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+  }
+
+  spawnHeart() {
+    const colors = [
+      'rgba(255,107,157,OPACITY)',
+      'rgba(255,179,198,OPACITY)',
+      'rgba(196,77,255,OPACITY)',
+      'rgba(255,51,102,OPACITY)',
+      'rgba(255,215,0,OPACITY)',
+    ];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    return {
+      x: Math.random() * this.canvas.width,
+      y: this.canvas.height + 20,
+      size: 6 + Math.random() * 18,
+      speed: 0.3 + Math.random() * 1.2,
+      opacity: 0.08 + Math.random() * 0.22,
+      color: color.replace('OPACITY', ''),
+      drift: (Math.random() - 0.5) * 0.5,
+      wobbleAmp: Math.random() * 30,
+      wobbleSpeed: 0.005 + Math.random() * 0.015,
+      wobbleOffset: Math.random() * Math.PI * 2,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.02,
+    };
+  }
+
+  drawHeart(ctx, x, y, size, opacity, color) {
+    ctx.save();
+    ctx.globalAlpha = opacity;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    const s = size / 16;
+    for (let t = 0; t < Math.PI * 2; t += 0.08) {
+      const px = x + s * 16 * Math.pow(Math.sin(t), 3);
+      const py = y - s * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+      if (t === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  update() {
+    if (!this.running) return;
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Spawn new particles
+    if (this.particles.length < 45 && Math.random() < 0.3) {
+      this.particles.push(this.spawnHeart());
+    }
+
+    this.particles = this.particles.filter(p => {
+      p.y -= p.speed;
+      p.x += p.drift + Math.sin(p.y * p.wobbleSpeed + p.wobbleOffset) * 0.3;
+      p.rotation += p.rotSpeed;
+      this.drawHeart(this.ctx, p.x, p.y, p.size, p.opacity, p.color);
+      return p.y > -30 && p.x > -30 && p.x < this.canvas.width + 30;
+    });
+
+    requestAnimationFrame(() => this.update());
+  }
+
+  stop() { this.running = false; }
+}
+
+/* ============================================
+   Confetti Burst
+   ============================================ */
+let confettiParticles = [];
+function burstConfetti() {
+  const canvas = dom.canvas;
+  const w = window.innerWidth, h = window.innerHeight;
+  const cx = w / 2, cy = h / 2;
+  const colors = ['#ff6b9d', '#ffb3c6', '#c44dff', '#ffd700', '#ff3366', '#4dc9f6', '#2ecc71', '#ff9a56'];
+  for (let i = 0; i < 80; i++) {
+    const angle = (Math.PI * 2 * i) / 80 + (Math.random() - 0.5) * 0.3;
+    const velocity = 4 + Math.random() * 10;
+    confettiParticles.push({
+      x: cx, y: cy,
+      vx: Math.cos(angle) * velocity,
+      vy: Math.sin(angle) * velocity - 4,
+      size: 3 + Math.random() * 8,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      life: 1,
+      decay: 0.008 + Math.random() * 0.018,
+      gravity: 0.08,
+      shape: Math.random() > 0.5 ? 'rect' : 'circle',
+    });
+  }
+}
+
+function renderConfetti(ctx) {
+  confettiParticles = confettiParticles.filter(c => {
+    c.x += c.vx;
+    c.y += c.vy;
+    c.vy += c.gravity;
+    c.life -= c.decay;
+    ctx.save();
+    ctx.globalAlpha = c.life;
+    ctx.fillStyle = c.color;
+    if (c.shape === 'circle') {
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.fillRect(c.x - c.size / 2, c.y - c.size / 2, c.size, c.size * 0.6);
+    }
+    ctx.restore();
+    return c.life > 0;
+  });
+}
+
+/* ============================================
+   Init
+   ============================================ */
+async function initApp() {
+  // Update names
+  dom.name1.textContent = CONFIG.coupleName1;
+  dom.name2.textContent = CONFIG.coupleName2;
+
+  // Load data
+  if (supabase) {
+    allMemories = await loadMemories();
+  } else {
+    // Demo mode
+    allMemories = JSON.parse(localStorage.getItem('love_demo_memories') || '[]');
+    // Seed demo data if empty
+    if (allMemories.length === 0) {
+      const today = new Date();
+      const fmt = (d) => d.toISOString().slice(0, 10);
+      allMemories = [
+        { id: 'demo_1', title: '第一次牵手 🤝', date: CONFIG.startDate, category: 'first', description: '那一天，我们的故事开始了...', photo_url: null, author: CONFIG.coupleName1, created_at: new Date().toISOString() },
+        { id: 'demo_2', title: '第一次一起看电影 🎬', date: fmt(new Date(today - 86400000 * 30)), category: 'first', description: '看了一场超棒的电影，你靠在我肩膀上的样子好可爱', photo_url: null, author: CONFIG.coupleName1, created_at: new Date().toISOString() },
+        { id: 'demo_3', title: '周末小旅行 🧳', date: fmt(new Date(today - 86400000 * 7)), category: 'travel', description: '一起去了周边的小镇，吃了好多好吃的！', photo_url: null, author: CONFIG.coupleName2, created_at: new Date().toISOString() },
+      ];
+      localStorage.setItem('love_demo_memories', JSON.stringify(allMemories));
+    }
+  }
+
+  // Render
+  renderTimeline(allMemories);
+  updateCounters();
+
+  // Set today's date as default for date input
+  dom.memDate.value = new Date().toISOString().slice(0, 10);
+
+  // Subscribe to realtime
+  subscribeRealtime();
+
+  // Start particle system
+  const particleSystem = new ParticleSystem(dom.canvas);
+  particleSystem.update();
+
+  // Render confetti on the same canvas
+  // We need to merge the rendering
+  const origUpdate = particleSystem.update.bind(particleSystem);
+  const ctx = particleSystem.ctx;
+  particleSystem.update = function () {
+    if (!this.running) return;
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Draw hearts
+    if (this.particles.length < 45 && Math.random() < 0.3) {
+      this.particles.push(this.spawnHeart());
+    }
+    this.particles = this.particles.filter(p => {
+      p.y -= p.speed;
+      p.x += p.drift + Math.sin(p.y * p.wobbleSpeed + p.wobbleOffset) * 0.3;
+      p.rotation += p.rotSpeed;
+      this.drawHeart(this.ctx, p.x, p.y, p.size, p.opacity, p.color);
+      return p.y > -30 && p.x > -30 && p.x < this.canvas.width + 30;
+    });
+
+    // Draw confetti
+    renderConfetti(ctx);
+
+    requestAnimationFrame(() => this.update());
+  };
+
+  // Periodic refresh for non-realtime fallback
+  setInterval(async () => {
+    const fresh = await loadMemories();
+    if (JSON.stringify(fresh) !== JSON.stringify(allMemories)) {
+      allMemories = fresh;
+      renderTimeline(allMemories);
+      updateCounters();
+    }
+  }, 10000);
+}
+
+/* ============================================
+   Event Listeners
+   ============================================ */
+// Password
+dom.pwdSubmit.addEventListener('click', handlePasswordSubmit);
+dom.pwdInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handlePasswordSubmit(); });
+
+// FAB
+dom.fabBtn.addEventListener('click', () => openModal('✨ 添加回忆'));
+
+// Modal
+dom.btnCancel.addEventListener('click', closeModal);
+dom.modalOverlay.addEventListener('click', (e) => { if (e.target === dom.modalOverlay) closeModal(); });
+dom.memoryForm.addEventListener('submit', handleFormSubmit);
+dom.btnDeleteMemory.addEventListener('click', handleDeleteInModal);
+
+// Photo preview
+dom.memPhoto.addEventListener('change', function () {
+  const file = this.files[0];
+  if (!file) { photoFile = null; photoDataUrl = null; dom.photoPreview.style.display = 'none'; return; }
+  photoFile = file;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    photoDataUrl = e.target.result;
+    dom.photoPreview.style.display = 'block';
+    dom.photoPreview.innerHTML = `
+      <img src="${photoDataUrl}" alt="预览">
+      <span class="remove-photo" id="removePhoto">✕ 移除照片</span>`;
+    $('#removePhoto')?.addEventListener('click', () => {
+      photoFile = null; photoDataUrl = null;
+      dom.memPhoto.value = '';
+      dom.photoPreview.style.display = 'none';
+    });
+  };
+  reader.readAsDataURL(file);
+});
+
+// Character count
+dom.memDesc.addEventListener('input', () => {
+  dom.charCount.textContent = dom.memDesc.value.length;
+});
+
+// Lightbox
+dom.lightbox.addEventListener('click', closeLightbox);
+
+// Keyboard
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { closeModal(); closeLightbox(); }
+});
+
+/* ============================================
+   Boot
+   ============================================ */
+(function boot() {
+  const configured = initSupabase();
+  const authed = sessionStorage.getItem('love_auth');
+
+  if (authed) {
+    dom.overlay.classList.add('hidden');
+    dom.app.style.display = 'block';
+    dom.fabContainer.style.display = 'block';
+    dom.name1.textContent = CONFIG.coupleName1;
+    dom.name2.textContent = CONFIG.coupleName2;
+    initApp();
+    if (!configured) showToast('演示模式 · 配置 Supabase 后获得完整功能', 'info');
+    return;
+  }
+
+  if (!configured) {
+    // Show hint on password screen
+    dom.pwdInput.placeholder = '演示模式，直接点进入';
+  }
+})();
+</script>
+
+</body>
+</html>
