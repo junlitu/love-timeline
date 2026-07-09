@@ -484,7 +484,90 @@ body {
   .modal { padding: 24px 18px; }
   .modal .category-options { gap: 6px; }
   .modal .category-options label { padding: 6px 10px; font-size: 0.72rem; }
+  .detail-modal { max-width: 100%; width: 94%; }
+  .detail-body { padding: 18px 16px 20px; }
+  .detail-photo { max-height: 240px; }
+  .memory-card .card-thumb { width: 48px; height: 48px; }
 }
+
+/* ============================================
+   Detail Modal
+   ============================================ */
+.detail-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(5, 0, 10, 0.88); backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2001; opacity: 0; visibility: hidden; transition: 0.3s;
+}
+.detail-overlay.active { opacity: 1; visibility: visible; }
+.detail-modal {
+  background: rgba(20, 5, 40, 0.95); border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl); padding: 0; overflow: hidden;
+  max-width: 520px; width: 92%; max-height: 88vh; overflow-y: auto;
+  backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 60px var(--pink-glow);
+  transform: translateY(20px); transition: transform 0.3s var(--transition);
+}
+.detail-overlay.active .detail-modal { transform: translateY(0); }
+.detail-close {
+  position: absolute; top: 12px; right: 14px; z-index: 10;
+  width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border-glass);
+  background: rgba(0,0,0,0.4); color: #fff; font-size: 1.1rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); backdrop-filter: blur(6px);
+}
+.detail-close:hover { background: rgba(255,51,102,0.3); border-color: var(--rose); }
+.detail-photo {
+  width: 100%; max-height: 360px; object-fit: cover; display: block;
+  cursor: pointer; transition: var(--transition);
+}
+.detail-photo:hover { opacity: 0.92; }
+.detail-body { padding: 24px 28px 28px; }
+.detail-body .detail-category {
+  display: inline-block; padding: 4px 12px; border-radius: 50px;
+  font-size: 0.75rem; font-weight: 600; letter-spacing: 1px; margin-bottom: 8px;
+}
+.detail-body .detail-daysago { font-size: 0.78rem; color: var(--text-muted); float: right; }
+.detail-body h2 {
+  font-family: var(--font-heading); font-size: 1.35rem; margin-bottom: 6px;
+  line-height: 1.4;
+}
+.detail-body .detail-meta {
+  font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px;
+}
+.detail-body .detail-desc {
+  font-size: 0.95rem; color: var(--text-soft); line-height: 1.8;
+  white-space: pre-wrap; word-break: break-word;
+}
+.detail-body .detail-desc-empty { color: var(--text-muted); font-style: italic; }
+.detail-actions {
+  display: flex; gap: 10px; margin-top: 24px; padding-top: 20px;
+  border-top: 1px solid var(--border-glass);
+}
+.detail-actions button {
+  flex: 1; padding: 11px; border-radius: 50px; border: none;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: var(--transition);
+  letter-spacing: 1px;
+}
+.detail-actions .dbtn-edit {
+  background: linear-gradient(135deg, var(--pink), var(--purple)); color: #fff;
+}
+.detail-actions .dbtn-edit:hover { box-shadow: 0 6px 20px var(--purple-glow); }
+.detail-actions .dbtn-delete {
+  background: rgba(255,51,102,0.12); color: var(--rose);
+  border: 1px solid rgba(255,51,102,0.3);
+}
+.detail-actions .dbtn-delete:hover { background: rgba(255,51,102,0.25); }
+
+/* Compact card */
+.memory-card { cursor: pointer; }
+.memory-card .card-thumb {
+  width: 60px; height: 60px; border-radius: var(--radius-sm);
+  object-fit: cover; flex-shrink: 0; margin-top: 6px;
+}
+.memory-card .card-row { display: flex; gap: 12px; align-items: flex-start; }
+.memory-card .card-body { flex: 1; min-width: 0; }
 </style>
 </head>
 <body>
@@ -598,6 +681,25 @@ body {
   </div>
 </div>
 
+<!-- Detail Modal -->
+<div class="detail-overlay" id="detailOverlay">
+  <div class="detail-modal">
+    <button class="detail-close" id="detailClose">✕</button>
+    <img class="detail-photo" id="detailPhoto" src="" alt="照片" style="display:none;">
+    <div class="detail-body">
+      <span class="detail-daysago" id="detailDaysAgo"></span>
+      <span class="detail-category" id="detailCategory"></span>
+      <h2 id="detailTitle"></h2>
+      <div class="detail-meta" id="detailMeta"></div>
+      <div class="detail-desc" id="detailDesc"></div>
+      <div class="detail-actions">
+        <button class="dbtn-edit" id="detailBtnEdit">✏️ 编辑</button>
+        <button class="dbtn-delete" id="detailBtnDelete">🗑️ 删除</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Image Lightbox -->
 <div class="lightbox" id="lightbox"><img src="" alt="照片" id="lightboxImg"></div>
 
@@ -657,6 +759,17 @@ const dom = {
   charCount: $('#charCount'),
   lightbox: $('#lightbox'),
   lightboxImg: $('#lightboxImg'),
+  // Detail modal
+  detailOverlay: $('#detailOverlay'),
+  detailClose: $('#detailClose'),
+  detailPhoto: $('#detailPhoto'),
+  detailDaysAgo: $('#detailDaysAgo'),
+  detailCategory: $('#detailCategory'),
+  detailTitle: $('#detailTitle'),
+  detailMeta: $('#detailMeta'),
+  detailDesc: $('#detailDesc'),
+  detailBtnEdit: $('#detailBtnEdit'),
+  detailBtnDelete: $('#detailBtnDelete'),
   toastContainer: $('#toastContainer'),
   canvas: $('#particleCanvas'),
 };
@@ -935,6 +1048,7 @@ function renderTimeline(memories) {
     card.className = `memory-card ${cat.border}`;
     card.style.animationDelay = `${i * 0.06}s`;
     card.setAttribute('data-id', m.id);
+    const hasPhoto = m.photo_url ? true : false;
     card.innerHTML = `
       <div class="tl-dot"></div>
       <span class="days-ago">${getDaysAgo(m.date)}</span>
@@ -942,19 +1056,16 @@ function renderTimeline(memories) {
         <span class="card-title">${escapeHtml(m.title)}</span>
         <span class="card-category ${cat.css}">${cat.icon} ${cat.label}</span>
       </div>
-      <div class="card-date">📅 ${formatDate(m.date)}${m.author ? ' · by ' + escapeHtml(m.author) : ''}</div>
-      ${m.description ? `<div class="card-desc">${escapeHtml(m.description)}</div>` : ''}
-      ${m.photo_url ? `<img class="card-photo" src="${escapeHtml(m.photo_url)}" alt="照片" loading="lazy" onclick="event.stopPropagation(); openLightbox('${escapeHtml(m.photo_url)}')">` : ''}
-      <div class="card-actions">
-        <button class="btn-edit" data-id="${m.id}">✏️ 编辑</button>
-        <button class="btn-delete" data-id="${m.id}">🗑️ 删除</button>
-      </div>`;
+      <div class="card-date">📅 ${formatDate(m.date)}${m.author ? ' · ' + escapeHtml(m.author) : ''}</div>
+      ${hasPhoto
+        ? `<div class="card-row"><div class="card-body"><span class="card-hint">📷 点击查看详情 →</span></div><img class="card-thumb" src="${escapeHtml(m.photo_url)}" alt="缩略图" loading="lazy"></div>`
+        : `<span class="card-hint">点击查看详情 →</span>`
+      }`;
 
     dom.timeline.appendChild(card);
 
-    // Click handlers
-    card.querySelector('.btn-edit').addEventListener('click', (e) => { e.stopPropagation(); openEditModal(m); });
-    card.querySelector('.btn-delete').addEventListener('click', (e) => { e.stopPropagation(); confirmDelete(m.id); });
+    // Click card → open detail modal
+    card.addEventListener('click', () => openDetailModal(m));
   });
 
   // Animate cards in view
@@ -1013,6 +1124,44 @@ function closeModal() {
 
 function openEditModal(memory) {
   openModal('✏️ 编辑回忆', memory);
+}
+
+/* ============================================
+   Detail Modal
+   ============================================ */
+let viewingMemoryId = null;
+
+function openDetailModal(memory) {
+  viewingMemoryId = memory.id;
+  const cat = CATEGORY_MAP[memory.category] || CATEGORY_MAP.daily;
+  dom.detailDaysAgo.textContent = getDaysAgo(memory.date);
+  dom.detailCategory.textContent = cat.icon + ' ' + cat.label;
+  dom.detailCategory.className = 'detail-category ' + cat.css;
+  dom.detailTitle.textContent = memory.title;
+  dom.detailMeta.textContent = '📅 ' + formatDate(memory.date) + (memory.author ? ' · ' + memory.author : '');
+  dom.detailDesc.textContent = memory.description || '';
+  dom.detailDesc.className = memory.description ? 'detail-desc' : 'detail-desc detail-desc-empty';
+  if (!memory.description) dom.detailDesc.textContent = '暂无描述';
+
+  // Photo
+  if (memory.photo_url) {
+    dom.detailPhoto.src = memory.photo_url;
+    dom.detailPhoto.style.display = 'block';
+    dom.detailPhoto.onclick = () => openLightbox(memory.photo_url);
+  } else {
+    dom.detailPhoto.src = '';
+    dom.detailPhoto.style.display = 'none';
+    dom.detailPhoto.onclick = null;
+  }
+
+  dom.detailOverlay.classList.add('active');
+  // Scroll to top
+  dom.detailOverlay.querySelector('.detail-modal').scrollTop = 0;
+}
+
+function closeDetailModal() {
+  dom.detailOverlay.classList.remove('active');
+  viewingMemoryId = null;
 }
 
 async function handleFormSubmit(e) {
@@ -1340,6 +1489,17 @@ dom.modalOverlay.addEventListener('click', (e) => { if (e.target === dom.modalOv
 dom.memoryForm.addEventListener('submit', handleFormSubmit);
 dom.btnDeleteMemory.addEventListener('click', handleDeleteInModal);
 
+// Detail Modal
+dom.detailClose.addEventListener('click', closeDetailModal);
+dom.detailOverlay.addEventListener('click', (e) => { if (e.target === dom.detailOverlay) closeDetailModal(); });
+dom.detailBtnEdit.addEventListener('click', () => {
+  const memory = allMemories.find(m => m.id === viewingMemoryId);
+  if (memory) { closeDetailModal(); openEditModal(memory); }
+});
+dom.detailBtnDelete.addEventListener('click', () => {
+  if (viewingMemoryId) { closeDetailModal(); confirmDelete(viewingMemoryId); }
+});
+
 // Photo preview
 dom.memPhoto.addEventListener('change', function () {
   const file = this.files[0];
@@ -1371,7 +1531,7 @@ dom.lightbox.addEventListener('click', closeLightbox);
 
 // Keyboard
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') { closeModal(); closeLightbox(); }
+  if (e.key === 'Escape') { closeModal(); closeDetailModal(); closeLightbox(); }
 });
 
 /* ============================================
