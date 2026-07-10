@@ -250,13 +250,14 @@ body {
 .stat-card .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 
 /* ============================================
-   Timeline
+   Timeline — Starry Storybook
    ============================================ */
-.timeline { position: relative; padding-left: 32px; }
+.timeline { position: relative; max-width: 800px; margin: 0 auto; padding: 0; }
 .timeline::before {
-  content: ''; position: absolute; left: 11px; top: 0; bottom: 0;
-  width: 2px; background: linear-gradient(to bottom, var(--pink), var(--purple), var(--pink-light));
-  border-radius: 1px;
+  content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
+  width: 0; border-left: 2px dashed rgba(255,107,157,0.4);
+  transform: translateX(-50%); z-index: 0;
+  box-shadow: 0 0 8px rgba(255,107,157,0.15);
 }
 .timeline-empty {
   text-align: center; padding: 60px 20px; color: var(--text-muted);
@@ -264,47 +265,107 @@ body {
 .timeline-empty .empty-icon { font-size: 4rem; display: block; margin-bottom: 12px; animation: float 4s ease-in-out infinite; }
 .timeline-empty p { font-family: var(--font-heading); font-size: 1rem; }
 
-/* Timeline dot */
-.tl-dot {
-  position: absolute; left: -26px; top: 24px;
-  width: 14px; height: 14px; border-radius: 50%;
-  background: var(--pink); box-shadow: 0 0 12px var(--pink-glow);
-  z-index: 1; transition: var(--transition);
+/* Year separator */
+.tl-year {
+  text-align: center; padding: 30px 0 10px; position: relative; z-index: 2;
+  clear: both;
 }
-.tl-item:hover .tl-dot { transform: scale(1.5); box-shadow: 0 0 20px var(--purple-glow); }
+.tl-year span {
+  font-family: var(--font-display); font-size: 2rem; font-weight: 700;
+  background: linear-gradient(135deg, var(--pink-light), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  letter-spacing: 4px;
+}
+.tl-year::before, .tl-year::after {
+  content: '✨'; font-size: 1.2rem; position: relative; top: -6px;
+}
+.tl-year::before { margin-right: 12px; }
+.tl-year::after { margin-left: 12px; }
+
+/* Star node (replaces tl-dot) */
+.tl-star {
+  position: absolute; top: 22px; z-index: 3;
+  width: 18px; height: 18px; background: var(--pink);
+  transform: rotate(45deg); border-radius: 3px;
+  box-shadow: 0 0 14px var(--pink-glow), 0 0 28px var(--pink-glow);
+  transition: all 0.4s var(--transition);
+  animation: star-glow 2s ease-in-out infinite;
+}
+@keyframes star-glow {
+  0%, 100% { box-shadow: 0 0 14px var(--pink-glow), 0 0 28px var(--pink-glow); }
+  50% { box-shadow: 0 0 22px var(--purple-glow), 0 0 44px var(--purple-glow); background: var(--purple); }
+}
+.memory-card:hover .tl-star {
+  transform: rotate(225deg) scale(1.5);
+  box-shadow: 0 0 30px var(--gold-glow), 0 0 50px var(--gold-glow);
+  background: var(--gold);
+}
+
+/* Left/right positioning for stars (desktop) */
+.card-left  .tl-star { right: -29px; }
+.card-right .tl-star { left: -29px; }
 
 /* ============================================
    Memory Card
    ============================================ */
 .memory-card {
-  position: relative; margin-bottom: 20px; padding: 20px 22px;
+  position: relative; margin-bottom: 24px; padding: 18px 20px;
   background: var(--bg-glass); border: 1px solid var(--border-glass);
   border-radius: var(--radius-lg); backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  transition: var(--transition); opacity: 0; transform: translateY(20px);
+  transition: all 0.4s var(--transition); opacity: 0; transform: translateY(20px);
+  cursor: pointer; width: calc(50% - 32px);
 }
 .memory-card.visible { opacity: 1; transform: translateY(0); transition: opacity 0.5s, transform 0.5s var(--transition); }
-.memory-card:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
-.memory-card .card-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
-.memory-card .card-title { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 600; flex: 1; min-width: 0; }
-.memory-card .card-date { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; }
-.memory-card .card-category { display: inline-block; padding: 3px 10px; border-radius: 50px; font-size: 0.72rem; font-weight: 600; letter-spacing: 1px; }
-.memory-card .card-desc { font-size: 0.9rem; color: var(--text-soft); line-height: 1.6; margin-top: 8px; }
-.memory-card .card-photo { margin-top: 12px; border-radius: var(--radius-md); width: 100%; max-height: 360px; object-fit: cover; cursor: pointer; transition: var(--transition); }
-.memory-card .card-photo:hover { transform: scale(1.02); box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
-.memory-card .card-actions { display: flex; gap: 8px; margin-top: 14px; justify-content: flex-end; }
-.memory-card .card-actions button {
-  padding: 6px 16px; border-radius: 50px; border: 1px solid var(--border-glass);
-  background: rgba(255,255,255,0.06); color: var(--text-muted);
-  font-size: 0.8rem; cursor: pointer; transition: var(--transition);
-}
-.memory-card .card-actions button:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
-.memory-card .card-actions .btn-edit:hover { background: rgba(196,77,255,0.2); border-color: var(--purple); }
-.memory-card .card-actions .btn-delete:hover { background: rgba(255,51,102,0.2); border-color: var(--rose); }
+.memory-card:hover { border-color: rgba(255,255,255,0.35); transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.4), 0 0 30px var(--pink-glow); }
+.memory-card .card-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+.memory-card .card-title { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 600; flex: 1; min-width: 0; }
+.memory-card .card-date { font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; }
+.memory-card .card-category { display: inline-block; padding: 3px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: 600; letter-spacing: 1px; }
 .memory-card .days-ago {
-  position: absolute; top: 20px; right: 22px;
-  font-size: 0.72rem; color: var(--text-muted);
+  position: absolute; top: 14px; right: 16px;
+  font-size: 0.7rem; color: var(--text-muted); opacity: 0.8;
 }
+
+/* Alternating layout (desktop) */
+.card-left  { margin-left: 0; margin-right: auto; clear: both; }
+.card-right { margin-left: auto; margin-right: 0; clear: both; }
+.card-left  .days-ago { right: auto; left: 16px; }
+.card-right .days-ago { right: 16px; left: auto; }
+
+/* Photo card — bigger and bolder */
+.memory-card.has-photo {
+  padding: 20px 24px;
+  border-image: linear-gradient(135deg, var(--pink), rgba(255,255,255,0.1)) 1;
+  box-shadow: 0 0 20px rgba(255,107,157,0.08);
+}
+.memory-card.has-photo .card-thumb {
+  width: 80px; height: 80px; border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+.memory-card.has-photo .card-title { font-size: 1.15rem; }
+
+/* Text-only card — compact and elegant */
+.memory-card.text-only {
+  padding: 14px 18px;
+}
+.memory-card.text-only .card-title { font-size: 0.95rem; }
+.memory-card.text-only .card-hint { font-size: 0.68rem; }
+
+/* Card thumbnail and row */
+.memory-card .card-thumb {
+  width: 60px; height: 60px; border-radius: var(--radius-sm);
+  object-fit: cover; flex-shrink: 0; margin-top: 4px;
+  transition: transform 0.3s;
+}
+.memory-card:hover .card-thumb { transform: scale(1.06); }
+.memory-card .card-row { display: flex; gap: 12px; align-items: flex-start; }
+.memory-card .card-body { flex: 1; min-width: 0; }
+.memory-card .card-hint {
+  font-size: 0.7rem; color: var(--text-muted); margin-top: 6px;
+  display: flex; align-items: center; gap: 3px; opacity: 0.6; transition: opacity 0.3s;
+}
+.memory-card:hover .card-hint { opacity: 1; color: var(--pink-light); }
 
 /* Category colors */
 .cat-first { background: rgba(255,215,0,0.15); color: var(--gold); }
@@ -312,6 +373,8 @@ body {
 .cat-anniversary { background: rgba(255,107,157,0.15); color: var(--pink); }
 .cat-special { background: rgba(196,77,255,0.15); color: var(--purple); }
 .cat-daily { background: rgba(46,204,113,0.15); color: var(--mint); }
+
+/* Category left border accent */
 .card-border-first { border-left: 3px solid var(--gold); }
 .card-border-travel { border-left: 3px solid var(--blue); }
 .card-border-anniversary { border-left: 3px solid var(--pink); }
@@ -464,7 +527,21 @@ body {
 /* ============================================
    Responsive
    ============================================ */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  /* Single-column timeline on mobile */
+  .timeline { max-width: 100%; padding-left: 28px; }
+  .timeline::before { left: 9px; border-left: 2px dashed rgba(255,107,157,0.35); transform: none; }
+  .card-left, .card-right { width: 100%; margin-left: 0; margin-right: 0; }
+  .card-left .tl-star, .card-right .tl-star { left: -24px; right: auto; }
+  .tl-year { text-align: left; padding-left: 8px; }
+  .tl-year span { font-size: 1.5rem; }
+  .tl-star { width: 14px; height: 14px; top: 20px; }
+  .memory-card { padding: 14px 16px; }
+  .memory-card .card-title { font-size: 0.95rem; }
+  .memory-card .days-ago { position: static; margin-bottom: 6px; }
+  .memory-card.has-photo .card-thumb { width: 56px; height: 56px; }
+  .memory-card .card-thumb { width: 44px; height: 44px; }
+
   .hero { padding: 36px 0 20px; }
   .hero .couple-names { font-size: 1.3rem; }
   .hero .days-count { font-size: 3.5rem; }
@@ -473,12 +550,6 @@ body {
   .stat-card .stat-num { font-size: 1.4rem; }
   .stat-card .stat-icon { font-size: 1.2rem; }
   .stat-card .stat-label { font-size: 0.68rem; }
-  .timeline { padding-left: 28px; }
-  .timeline::before { left: 9px; }
-  .tl-dot { left: -24px; top: 22px; width: 12px; height: 12px; }
-  .memory-card { padding: 16px; }
-  .memory-card .card-title { font-size: 1rem; }
-  .memory-card .days-ago { position: static; margin-bottom: 6px; }
   .fab { width: 50px; height: 50px; font-size: 24px; }
   .fab-container { bottom: 24px; right: 20px; }
   .modal { padding: 24px 18px; }
@@ -487,7 +558,6 @@ body {
   .detail-modal { max-width: 100%; width: 94%; }
   .detail-body { padding: 18px 16px 20px; }
   .detail-photo { max-height: 240px; }
-  .memory-card .card-thumb { width: 48px; height: 48px; }
 }
 
 /* ============================================
@@ -560,14 +630,6 @@ body {
 }
 .detail-actions .dbtn-delete:hover { background: rgba(255,51,102,0.25); }
 
-/* Compact card */
-.memory-card { cursor: pointer; }
-.memory-card .card-thumb {
-  width: 60px; height: 60px; border-radius: var(--radius-sm);
-  object-fit: cover; flex-shrink: 0; margin-top: 6px;
-}
-.memory-card .card-row { display: flex; gap: 12px; align-items: flex-start; }
-.memory-card .card-body { flex: 1; min-width: 0; }
 </style>
 </head>
 <body>
@@ -1042,15 +1104,31 @@ function renderTimeline(memories) {
     return;
   }
 
-  memories.forEach((m, i) => {
+  let cardIdx = 0;
+  let lastYear = null;
+
+  memories.forEach((m) => {
     const cat = CATEGORY_MAP[m.category] || CATEGORY_MAP.daily;
-    const card = document.createElement('div');
-    card.className = `memory-card ${cat.border}`;
-    card.style.animationDelay = `${i * 0.06}s`;
-    card.setAttribute('data-id', m.id);
     const hasPhoto = m.photo_url ? true : false;
+    const year = new Date(m.date + 'T00:00:00').getFullYear();
+
+    // Insert year separator
+    if (year !== lastYear) {
+      const yearEl = document.createElement('div');
+      yearEl.className = 'tl-year';
+      yearEl.innerHTML = `<span>${year}</span>`;
+      dom.timeline.appendChild(yearEl);
+      lastYear = year;
+    }
+
+    const card = document.createElement('div');
+    const side = (cardIdx % 2 === 0) ? 'card-right' : 'card-left';
+    const sizeClass = hasPhoto ? 'has-photo' : 'text-only';
+    card.className = `memory-card ${cat.border} ${side} ${sizeClass}`;
+    card.style.animationDelay = `${cardIdx * 0.06}s`;
+    card.setAttribute('data-id', m.id);
     card.innerHTML = `
-      <div class="tl-dot"></div>
+      <div class="tl-star"></div>
       <span class="days-ago">${getDaysAgo(m.date)}</span>
       <div class="card-header">
         <span class="card-title">${escapeHtml(m.title)}</span>
@@ -1066,6 +1144,7 @@ function renderTimeline(memories) {
 
     // Click card → open detail modal
     card.addEventListener('click', () => openDetailModal(m));
+    cardIdx++;
   });
 
   // Animate cards in view
